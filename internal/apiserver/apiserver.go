@@ -1,8 +1,9 @@
 package apiserver
 
 import (
-	"log"
+	"fmt"
 	"net/http"
+	"os"
 	"reflect"
 
 	"example.com/arch/user-service/internal/users"
@@ -75,6 +76,8 @@ func (s *Server) CreateUser(ctx *gin.Context) {
 			)
 			return
 		}
+
+		fmt.Fprintf(os.Stderr, "Internal server error: %v\n", err)
 		ctx.JSON(
 			http.StatusInternalServerError,
 			gin.H{"code": 500, "message": "Failed user's creation"},
@@ -106,7 +109,7 @@ func (s *Server) DeleteUser(ctx *gin.Context) {
 			return
 		}
 
-		log.Println(err)
+		fmt.Fprintf(os.Stderr, "Internal server error: %v\n", err)
 		ctx.JSON(
 			http.StatusInternalServerError,
 			gin.H{"code": 500, "message": "Internal server error"},
@@ -154,7 +157,7 @@ func (s *Server) UpdateUser(ctx *gin.Context) {
 			return
 		}
 
-		log.Println(err)
+		fmt.Fprintf(os.Stderr, "Internal server error: %v\n", err)
 		ctx.JSON(
 			http.StatusInternalServerError,
 			gin.H{"code": 500, "message": "Internal server error"},
@@ -185,7 +188,7 @@ func (s *Server) GetUser(ctx *gin.Context) {
 			return
 		}
 
-		log.Println(err)
+		fmt.Fprintf(os.Stderr, "Internal server error: %v\n", err)
 		ctx.JSON(
 			http.StatusInternalServerError,
 			gin.H{"code": 500, "message": "Internal server error"},
