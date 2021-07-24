@@ -1,0 +1,22 @@
+version: '3'
+
+services: 
+    user_db:
+        image: postgres
+        container_name: user-db
+        volumes: 
+            - db:/var/lib/postgresql/data
+        environment: 
+            - POSTGRES_DB=user_db
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
+        networks: 
+            - mynet
+        ports: 
+            - "5432:5432"
+networks:
+    mynet:
+        driver: bridge
+
+volumes:
+    db:
