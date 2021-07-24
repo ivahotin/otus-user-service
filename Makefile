@@ -1,15 +1,15 @@
 .PHONY: build
 build:
-	go build -v ./cmd/apiserver
+	go build -o build/apiserver -v ./cmd/apiserver
 
 .PHONY: run
 run:
-	go build -v ./cmd/apiserver
-	./apiserver
+	go build -o build/apiserver -v ./cmd/apiserver
+	./build/apiserver
 
 .PHONY: clean
 clean:
-	rm apiserver
+	rm build/apiserver
 
 .PHONY: local-run
 local-run:
