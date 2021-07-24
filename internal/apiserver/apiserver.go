@@ -30,7 +30,7 @@ func NewServer() *Server {
 	router := gin.Default()
 	router.RemoveExtraSlash = true
 
-	router.HEAD("/health", server.Health)
+	router.GET("/health", server.Health)
 	superGroup := router.Group("/api/v1")
 	{
 		userGroup := superGroup.Group("/user")
