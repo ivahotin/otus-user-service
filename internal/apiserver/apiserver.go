@@ -30,6 +30,7 @@ func NewServer() *Server {
 	router := gin.Default()
 	router.RemoveExtraSlash = true
 
+	router.HEAD("/health", server.Health)
 	superGroup := router.Group("/api/v1")
 	{
 		userGroup := superGroup.Group("/user")
@@ -47,6 +48,10 @@ func NewServer() *Server {
 
 func (s *Server) Start() error {
 	return s.router.Run("0.0.0.0:8000")
+}
+
+func (s *Server) Health(ctx *gin.Context) {
+	ctx.Writer.WriteHeader(http.StatusOK)
 }
 
 func (s *Server) CreateUser(ctx *gin.Context) {
