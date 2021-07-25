@@ -1,15 +1,18 @@
+ENTRYPOINT?=./cmd/apiserver
+BINARY?=./build/apiserver
+
 .PHONY: build
-build:
-	go build -o build/apiserver -v ./cmd/apiserver
+build: clean
+	go build -o ${BINARY} -v ${ENTRYPOINT}
 
 .PHONY: run
-run:
-	go build -o build/apiserver -v ./cmd/apiserver
+run: build
+	go build -o ${BINARY} -v ${ENTRYPOINT}
 	./build/apiserver
 
 .PHONY: clean
 clean:
-	rm build/apiserver
+	rm ${BINARY}
 
 .PHONY: local-run
 local-run:
