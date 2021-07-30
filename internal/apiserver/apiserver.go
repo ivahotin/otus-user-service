@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"os"
 	"reflect"
-	"strings"
 
 	"example.com/arch/user-service/internal/users"
 	"example.com/arch/user-service/internal/users/models"
@@ -58,7 +57,7 @@ func createPrometheus() *ginprometheus.Prometheus {
 		url := c.Request.URL.Path
 		for _, p := range c.Params {
 			if p.Key == "id" {
-				url = strings.Replace(url, p.Value, ":id", 1)
+				url = "/api/v1/user/:id"
 				break
 			}
 		}
