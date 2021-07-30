@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"reflect"
+	"strings"
 
 	"example.com/arch/user-service/internal/users"
 	"example.com/arch/user-service/internal/users/models"
@@ -12,6 +13,7 @@ import (
 	"example.com/arch/user-service/internal/users/service"
 	"example.com/arch/user-service/pkg/database"
 	"github.com/gin-gonic/gin"
+	"github.com/zsais/go-gin-prometheus"
 )
 
 const validationErrorName = "ValidationErrors"
@@ -30,6 +32,9 @@ func NewServer() *Server {
 	router := gin.Default()
 	router.RemoveExtraSlash = true
 
+	prometheus := createPrometheus()
+	prometheus.Use(router)
+
 	router.GET("/health", server.Health)
 	superGroup := router.Group("/api/v1")
 	{
@@ -44,6 +49,23 @@ func NewServer() *Server {
 
 	server.router = router
 	return server
+}
+
+func createPrometheus() *ginprometheus.Prometheus {
+	prom := ginprometheus.NewPrometheus("api")
+
+	prom.ReqCntURLLabelMappingFn = func(c *gin.Context) string {
+		url := c.Request.URL.Path
+		for _, p := range c.Params {
+			if p.Key == "id" {
+				url = strings.Replace(url, p.Value, ":id", 1)
+				break
+			}
+		}
+		return url
+	}
+
+	return prom
 }
 
 func (s *Server) Start() error {

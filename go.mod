@@ -18,6 +18,7 @@ require (
 	github.com/opentracing/opentracing-go v1.1.0 // indirect
 	github.com/uber/tchannel-go v1.21.2
 	github.com/ugorji/go v1.2.6 // indirect
+	github.com/zsais/go-gin-prometheus v0.1.0
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97 // indirect
 	golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c // indirect
 	google.golang.org/protobuf v1.27.1 // indirect

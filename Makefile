@@ -12,7 +12,7 @@ run: build
 
 .PHONY: clean
 clean:
-	rm ${BINARY}
+	rm -f ${BINARY}
 
 .PHONY: local-run
 local-run:
