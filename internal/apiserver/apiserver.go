@@ -2,6 +2,7 @@ package apiserver
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
 	"os"
 	"reflect"
@@ -12,7 +13,9 @@ import (
 	"example.com/arch/user-service/internal/users/service"
 	"example.com/arch/user-service/pkg/database"
 	"github.com/gin-gonic/gin"
-	"github.com/zsais/go-gin-prometheus"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+	ginprometheus "github.com/zsais/go-gin-prometheus"
 )
 
 const validationErrorName = "ValidationErrors"
@@ -20,6 +23,22 @@ const validationErrorName = "ValidationErrors"
 type Server struct {
 	userService users.UserService
 	router      *gin.Engine
+}
+
+var httpDuration = promauto.NewHistogramVec(prometheus.HistogramOpts{
+	Name: "http_response_time_seconds",
+	Help: "Duration of HTTP requests.",
+}, []string{"method", "url"})
+
+func Failer() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		randomNum := rand.Intn(101)
+		if randomNum <= 5 && ctx.Request.URL.Path == "/health" {
+			ctx.Writer.WriteHeader(http.StatusInternalServerError)
+		} else {
+			ctx.Next()
+		}
+	}
 }
 
 func NewServer() *Server {
@@ -76,6 +95,7 @@ func (s *Server) Health(ctx *gin.Context) {
 }
 
 func (s *Server) CreateUser(ctx *gin.Context) {
+	timer := prometheus.NewTimer(httpDuration.WithLabelValues("POST", "/api/v1/user/"))
 	var req createUserRequest
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -112,9 +132,11 @@ func (s *Server) CreateUser(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"id": userId})
+	timer.ObserveDuration()
 }
 
 func (s *Server) DeleteUser(ctx *gin.Context) {
+	timer := prometheus.NewTimer(httpDuration.WithLabelValues("DELETE", "/api/v1/user/:id"))
 	var req deleteUserRequest
 
 	if err := ctx.ShouldBindUri(&req); err != nil {
@@ -144,9 +166,11 @@ func (s *Server) DeleteUser(ctx *gin.Context) {
 	}
 
 	ctx.Writer.WriteHeader(http.StatusNoContent)
+	timer.ObserveDuration()
 }
 
 func (s *Server) UpdateUser(ctx *gin.Context) {
+	timer := prometheus.NewTimer(httpDuration.WithLabelValues("PUT", "/api/v1/user/:id"))
 	var reqBody updateUserRequestBody
 
 	if err := ctx.ShouldBindJSON(&reqBody); err != nil {
@@ -191,9 +215,11 @@ func (s *Server) UpdateUser(ctx *gin.Context) {
 		return
 	}
 	ctx.Writer.WriteHeader(http.StatusOK)
+	timer.ObserveDuration()
 }
 
 func (s *Server) GetUser(ctx *gin.Context) {
+	timer := prometheus.NewTimer(httpDuration.WithLabelValues("GET", "/api/v1/user/:id"))
 	var req getUserRequest
 
 	if err := ctx.ShouldBindUri(&req); err != nil {
@@ -232,4 +258,5 @@ func (s *Server) GetUser(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, response)
+	timer.ObserveDuration()
 }
