@@ -94,7 +94,6 @@ postgresql:
   postgresqlPassword: postgres
   postgresqlDatabase: user-db
   fullnameOverride: "user-db"
-  postgresqlMaxConnections: 100
   service:
     port: "5432"
   metrics:
