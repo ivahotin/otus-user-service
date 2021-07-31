@@ -11,6 +11,7 @@ User API
 `kubectl config set-context --current --namespace=monitoring`
 `helm repo add prometheus-community https://prometheus-community.github.io/helm-charts`
 `helm upgrade --install -f infra/prometheus/prometheus.yaml prometheus prometheus-community/kube-prometheus-stack --atomic`
+`helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx`
 `helm upgrade --install -f infra/prometheus/nginx-ingress.yaml nginx ingress-nginx/ingress-nginx --atomic`
 
 `kubectl create ns user-service`
@@ -24,3 +25,13 @@ User API
 ### Удаление
 
 `helm uninstall user-service`
+
+### Скриншот стресс тестирования
+
+`wrk -t3 -c4 -d20m --latency http://arch.homework/api/v1/user/2`
+
+![Alt text](./dashboard/dashboard.png "Dashboard")
+
+### Дашборд
+
+`./dashboard/dashboard.json`

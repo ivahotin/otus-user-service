@@ -15,7 +15,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 27,
+  "id": 26,
   "links": [],
   "panels": [
     {
@@ -289,7 +289,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "(sum(rate(nginx_ingress_controller_requests{status=500}[1m]))) / sum(rate(nginx_ingress_controller_requests[1m]))",
+          "expr": "(sum(rate(nginx_ingress_controller_requests{status=\"500\"}[1m]))) / sum(rate(nginx_ingress_controller_requests[1m]))",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -739,7 +739,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "(sum by (method, url) (rate(api_requests_total{code~=\"500\"}[1m]))) / (sum by (method, url) (rate(api_requests_total[1m])))",
+          "expr": "(sum by (method, url) (rate(api_requests_total{code=\"500\"}[1m]))) / (sum by (method, url) (rate(api_requests_total[1m])))",
           "interval": "",
           "legendFormat": "{{ method }} {{ url }}",
           "refId": "A"
@@ -880,7 +880,7 @@
           "refId": "A"
         }
       ],
-      "title": "RAM usage",
+      "title": "RAM saturation",
       "type": "gauge"
     },
     {
@@ -957,6 +957,6 @@
   "timepicker": {},
   "timezone": "",
   "title": "User service",
-  "uid": "CZM-xkM7z",
-  "version": 14
+  "uid": "32jvUkM7k",
+  "version": 3
 }
