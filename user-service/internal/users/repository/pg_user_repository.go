@@ -10,10 +10,10 @@ import (
 )
 
 const (
-	getByIdQuery    = "select id, username, firstname, lastname, email, phone from users where id = $1"
-	insertUserQuery = "insert into users (username, firstname, lastname, email, phone) values ($1, $2, $3, $4, $5) returning id"
-	deleteUserQuery = "delete from users where id = $1"
-	updateUserQuery = "update users set username = $1, firstname = $2, lastname = $3, email = $4, phone = $5 where id = $6"
+	getByIdQuery    = "select id, username, firstname, lastname, email, phone, owner_id from users where id = $1"
+	insertUserQuery = "insert into users (username, firstname, lastname, email, phone, owner_id) values ($1, $2, $3, $4, $5, $6) returning id"
+	deleteUserQuery = "delete from users where id = $1 and owner_id = $2"
+	updateUserQuery = "update users set username = $1, firstname = $2, lastname = $3, email = $4, phone = $5 where id = $6 and owner_id = $7"
 )
 
 type PostgresUserRepository struct {
@@ -33,6 +33,7 @@ func (repo *PostgresUserRepository) CreateUser(user *models.User) (models.UserId
 		user.Lastname,
 		user.Email,
 		user.Phone,
+		user.OwnerId,
 	)
 	var userId models.UserId
 	err := row.Scan(&userId)
@@ -66,6 +67,7 @@ func (repo *PostgresUserRepository) UpdateUser(user *models.User) error {
 		user.Email,
 		user.Phone,
 		user.Id,
+		user.OwnerId,
 	)
 	if err != nil {
 		return err
@@ -76,8 +78,8 @@ func (repo *PostgresUserRepository) UpdateUser(user *models.User) error {
 	return nil
 }
 
-func (repo *PostgresUserRepository) DeleteUser(userId models.UserId) error {
-	tag, err := repo.db.Exec(context.Background(), deleteUserQuery, userId)
+func (repo *PostgresUserRepository) DeleteUser(userId models.UserId, ownerId string) error {
+	tag, err := repo.db.Exec(context.Background(), deleteUserQuery, userId, ownerId)
 	if err != nil {
 		return err
 	}

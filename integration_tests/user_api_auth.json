@@ -1,0 +1,746 @@
+{
+	"info": {
+		"_postman_id": "8456c50b-21e7-419f-90dd-94bc5ec3b7ca",
+		"name": "User API with auth",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Register the first user",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let username = pm.variables.replaceIn(\"{{$randomUserName}}\")",
+							"pm.collectionVariables.set(\"firstUserLogin\", username)",
+							"let password = pm.variables.replaceIn(\"{{$randomPassword}}\")",
+							"pm.collectionVariables.set(\"firstUserPassword\", password)"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Should register first user\", function() {",
+							"    pm.response.to.have.status(201);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{firstUserLogin}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{firstUserPassword}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/auth/register",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "First user login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"First user should login\", function() {",
+							"    pm.response.to.have.status(200);",
+							"    let firstUserSessionId = pm.response.cookies.get(\"session_id\");",
+							"    pm.collectionVariables.set(\"firstUserSessionId\", firstUserSessionId);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{firstUserLogin}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{firstUserPassword}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/auth/login",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "First user creates its profile",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Should create first user's profile\", function() {",
+							"    pm.response.to.have.status(200);",
+							"    let jsonData = pm.response.json();",
+							"    pm.collectionVariables.set(\"firstUserId\", jsonData.id);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let cookieJar = pm.cookies.jar();",
+							"let firstUserSessionId = pm.collectionVariables.get(\"firstUserSessionId\");",
+							"cookieJar.set(\"{{$baseUrl}}\", \"session_id\", firstUserSessionId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"johndoe589\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"bestjohn@doe.com\",\n    \"phone\": \"+71002003040\"\n}"
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/api/v1/user/",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"user",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout first user Copy",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let cookieJar = pm.cookies.jar();",
+							"let firstUserSessionId = pm.collectionVariables.get(\"firstUserSessionId\");",
+							"cookieJar.set(\"{{$baseUrl}}\", \"session_id\", firstUserSessionId);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Should logout first user\", function() {",
+							"    pm.response.to.have.status(200);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/auth/logout",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User can't get its profile without login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Shouldn't be able to get user profile without auth\", function() {",
+							"    pm.response.to.have.status(401);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/v1/user/{{firstUserId}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"user",
+						"{{firstUserId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User can't update its profile without auth",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"User can't update its profile without auth\", function() {",
+							"    pm.response.to.have.status(401);    ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let username = pm.variables.replaceIn(\"{{$randomFirstName}}\")",
+							"pm.collectionVariables.set(\"firstUserFirstName\", username)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": {{firstUserFirstName}},\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"bestjohn@doe.com\",\n    \"phone\": \"+71002003040\"\n}"
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/api/v1/user/{{firstUserId}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"user",
+						"{{firstUserId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "First user login again",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"First user should login\", function() {",
+							"    pm.response.to.have.status(200);",
+							"    let firstUserSessionId = pm.response.cookies.get(\"session_id\");",
+							"    pm.collectionVariables.set(\"firstUserSessionId\", firstUserSessionId);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{firstUserLogin}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{firstUserPassword}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/auth/login",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "First user changes its profile",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let username = pm.variables.replaceIn(\"{{$randomFirstName}}\")",
+							"pm.collectionVariables.set(\"firstUserFirstName\", username)",
+							"let cookieJar = pm.cookies.jar();",
+							"let firstUserSessionId = pm.collectionVariables.get(\"firstUserSessionId\");",
+							"cookieJar.set(\"{{$baseUrl}}\", \"session_id\", firstUserSessionId);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"First user updates its profile\", function() {",
+							"    pm.response.to.have.status(200);    ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"johndoe589\",\n    \"firstName\": \"{{firstUserFirstName}}\",\n    \"lastName\": \"Doe\",\n    \"email\": \"bestjohn@doe.com\",\n    \"phone\": \"+71002003040\"\n}"
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/api/v1/user/{{firstUserId}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"user",
+						"{{firstUserId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check that first user's profile is changed",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let cookieJar = pm.cookies.jar();",
+							"let firstUserSessionId = pm.collectionVariables.get(\"firstUserSessionId\");",
+							"cookieJar.set(\"{{$baseUrl}}\", \"session_id\", firstUserSessionId);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check that the first user's profile is changed\", function() {",
+							"    pm.response.to.have.status(200);",
+							"",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.firstName).to.eq(pm.collectionVariables.get(\"firstUserFirstName\"));",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/v1/user/{{firstUserId}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"user",
+						"{{firstUserId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout first user again",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let cookieJar = pm.cookies.jar();",
+							"let firstUserSessionId = pm.collectionVariables.get(\"firstUserSessionId\");",
+							"cookieJar.set(\"{{$baseUrl}}\", \"session_id\", firstUserSessionId);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Should logout first user\", function() {",
+							"    pm.response.to.have.status(200);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/auth/logout",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register the second user",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let username = pm.variables.replaceIn(\"{{$randomUserName}}\")",
+							"pm.collectionVariables.set(\"secondUserName\", username)",
+							"let password = pm.variables.replaceIn(\"{{$randomPassword}}\")",
+							"pm.collectionVariables.set(\"secondUserPassword\", password)"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Should register first user\", function() {",
+							"    pm.response.to.have.status(201);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{secondUserName}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{secondUserPassword}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/auth/register",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Second user login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Second user login\", function() {",
+							"    pm.response.to.have.status(200);",
+							"    let secondUserSessionId = pm.response.cookies.get(\"session_id\");",
+							"    pm.collectionVariables.set(\"secondUserSessionId\", secondUserSessionId);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{secondUserName}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{secondUserPassword}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/auth/login",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User can't get another user's profile",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"User can't get another user's profile\", function() {",
+							"    pm.response.to.have.status(403);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let cookieJar = pm.cookies.jar();",
+							"let secondUserSessionId = pm.collectionVariables.get(\"secondUserSessionId\");",
+							"cookieJar.set(\"{{$baseUrl}}\", \"session_id\", secondUserSessionId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/v1/user/{{firstUserId}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"user",
+						"{{firstUserId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User can't update another user's profile",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let username = pm.variables.replaceIn(\"{{$randomFirstName}}\")",
+							"pm.collectionVariables.set(\"firstUserFirstName\", username)",
+							"let cookieJar = pm.cookies.jar();",
+							"let secondUserSessionId = pm.collectionVariables.get(\"secondUserSessionId\");",
+							"cookieJar.set(\"{{$baseUrl}}\", \"session_id\", secondUserSessionId);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"User can't update another user's profile\", function() {",
+							"    pm.response.to.have.status(404);    ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"johndoe589\",\n    \"firstName\": \"{{firstUserFirstName}}\",\n    \"lastName\": \"Doe\",\n    \"email\": \"bestjohn@doe.com\",\n    \"phone\": \"+71002003040\"\n}"
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/api/v1/user/{{firstUserId}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"user",
+						"{{firstUserId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "arch.homework"
+		},
+		{
+			"key": "firstUserLogin",
+			"value": ""
+		},
+		{
+			"key": "firstUserPassword",
+			"value": ""
+		},
+		{
+			"key": "firstUserSessionId",
+			"value": ""
+		},
+		{
+			"key": "firstUserId",
+			"value": ""
+		},
+		{
+			"key": "firstUserFirstName",
+			"value": ""
+		},
+		{
+			"key": "secondUserSessionId",
+			"value": ""
+		},
+		{
+			"key": "secondUserName",
+			"value": ""
+		},
+		{
+			"key": "secondUserPassword",
+			"value": ""
+		}
+	]
+}

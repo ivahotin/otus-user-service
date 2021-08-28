@@ -27,3 +27,7 @@ type updateUserRequestBody struct {
 type updateUserRequestUri struct {
 	Id int64 `uri:"id" binding:"required"`
 }
+
+type header struct {
+	UserId string `header:"x-user-id"`
+}

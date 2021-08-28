@@ -9,4 +9,5 @@ type User struct {
 	Lastname  string `validate:"required,max=50"`
 	Email     string `validate:"required,max=50,email"`
 	Phone     string `validate:"required,len=12"`
+	OwnerId   string
 }

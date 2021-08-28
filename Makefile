@@ -3,35 +3,31 @@ BINARY?=./build/apiserver
 
 .PHONY: install
 install:
-	kubectl create ns monitoring
-	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-	helm upgrade --install -n monitoring -f infra/prometheus/prometheus.yaml prometheus prometheus-community/kube-prometheus-stack --atomic
-	helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-	helm upgrade --install -f infra/prometheus/nginx-ingress.yaml nginx ingress-nginx/ingress-nginx --atomic
-	sleep 60
 	kubectl create ns user-service
 	helm upgrade --install -n user-service -f infra/user-service/values.yaml user-service infra/user-service/.
+	kubectl create ns auth-service
+	helm upgrade --install -n auth-service -f infra/auth-service/values.yaml auth-service infra/auth-service/.
+	kubectl apply -f infra/api-gateway/ingress.yaml
 
 .PHONY: uninstall
 uninstall:
 	helm uninstall user-service -n user-service
-	helm uninstall nginx
-	helm uninstall prometheus -n monitoring
-	kubectl delete ns monitoring
+	helm uninstall auth-service -n auth-service
 	kubectl delete ns user-service
+	kubectl delete ns auth-service
 
 .PHONY: build
 build: clean
-	go build -o ${BINARY} -v ${ENTRYPOINT}
+	cd user-service; go build -o ${BINARY} -v ${ENTRYPOINT}
 
 .PHONY: run
 run: build
-	go build -o ${BINARY} -v ${ENTRYPOINT}
-	./build/apiserver
+	cd user-service; go build -o ${BINARY} -v ${ENTRYPOINT}
+	cd user-service; ./build/apiserver
 
 .PHONY: clean
 clean:
-	rm -f ${BINARY}
+	cd user-service; rm -f ${BINARY}
 
 .PHONY: local-run
 local-run:

@@ -1,0 +1,52 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: otus-auth-service
+spec:
+  type: ExternalName
+  externalName: otus-auth-service.auth-service.svc.cluster.local
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: otus-user-service
+spec:
+  type: ExternalName
+  externalName: otus-user-service.user-service.svc.cluster.local
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: user-service
+  annotations:
+    nginx.ingress.kubernetes.io/auth-url: http://otus-auth-service.auth-service.svc.cluster.local/auth
+    nginx.ingress.kubernetes.io/auth-response-headers: x-user-id
+spec:
+  rules:
+    - host: arch.homework
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: otus-user-service
+                port:
+                  number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: auth-service
+spec:
+  rules:
+    - host: arch.homework
+      http:
+        paths:
+          - path: /auth
+            pathType: Prefix
+            backend:
+              service:
+                name: otus-auth-service
+                port:
+                  number: 80

@@ -15,7 +15,7 @@ services:
         networks: 
             - mynet
     user_service:
-        build: .
+        build: ./user-service
         container_name: user-service
         env_file: 
             - .local.env

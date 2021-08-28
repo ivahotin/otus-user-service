@@ -2,7 +2,6 @@ package apiserver
 
 import (
 	"fmt"
-	"math/rand"
 	"net/http"
 	"os"
 	"reflect"
@@ -29,17 +28,6 @@ var httpDuration = promauto.NewHistogramVec(prometheus.HistogramOpts{
 	Name: "http_response_time_seconds",
 	Help: "Duration of HTTP requests.",
 }, []string{"method", "url"})
-
-func Failer() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		randomNum := rand.Intn(101)
-		if randomNum <= 5 && ctx.Request.URL.Path == "/health" {
-			ctx.Writer.WriteHeader(http.StatusInternalServerError)
-		} else {
-			ctx.Next()
-		}
-	}
-}
 
 func NewServer() *Server {
 	db := database.GetPgxPool()
@@ -106,12 +94,22 @@ func (s *Server) CreateUser(ctx *gin.Context) {
 		return
 	}
 
+	var h header
+	if err := ctx.ShouldBindHeader(&h); err != nil {
+		ctx.JSON(
+			http.StatusForbidden,
+			gin.H{"code": 403, "message": "Invalid user id"},
+		)
+		return
+	}
+
 	user := models.User{
 		Username:  req.Username,
 		Firstname: req.FirstName,
 		Lastname:  req.LastName,
 		Email:     req.Email,
 		Phone:     req.Phone,
+		OwnerId:   h.UserId,
 	}
 	userId, err := s.userService.CreateUser(&user)
 	if err != nil {
@@ -147,7 +145,16 @@ func (s *Server) DeleteUser(ctx *gin.Context) {
 		return
 	}
 
-	err := s.userService.DeleteUser(models.UserId(req.Id))
+	var h header
+	if err := ctx.ShouldBindHeader(&h); err != nil {
+		ctx.JSON(
+			http.StatusForbidden,
+			gin.H{"code": 403, "message": "Invalid user id"},
+		)
+		return
+	}
+
+	err := s.userService.DeleteUser(models.UserId(req.Id), h.UserId)
 	if err != nil {
 		if err == users.ErrNotFound {
 			ctx.JSON(
@@ -190,6 +197,15 @@ func (s *Server) UpdateUser(ctx *gin.Context) {
 		return
 	}
 
+	var h header
+	if err := ctx.ShouldBindHeader(&h); err != nil {
+		ctx.JSON(
+			http.StatusForbidden,
+			gin.H{"code": 403, "message": "Invalid user id"},
+		)
+		return
+	}
+
 	user := models.User{
 		Id:        models.UserId(reqUri.Id),
 		Username:  reqBody.Username,
@@ -197,12 +213,21 @@ func (s *Server) UpdateUser(ctx *gin.Context) {
 		Lastname:  reqBody.LastName,
 		Email:     reqBody.Email,
 		Phone:     reqBody.Phone,
+		OwnerId:   h.UserId,
 	}
 	if err := s.userService.UpdateUser(&user); err != nil {
 		if ok := reflect.TypeOf(err).Name() == validationErrorName; ok {
 			ctx.JSON(
 				http.StatusBadRequest,
 				gin.H{"code": 400, "message": err.Error()},
+			)
+			return
+		}
+
+		if err == users.ErrNotFound {
+			ctx.JSON(
+				http.StatusNotFound,
+				gin.H{"code": 404, "message": "User profile for this owner isn't found"},
 			)
 			return
 		}
@@ -221,11 +246,20 @@ func (s *Server) UpdateUser(ctx *gin.Context) {
 func (s *Server) GetUser(ctx *gin.Context) {
 	timer := prometheus.NewTimer(httpDuration.WithLabelValues("GET", "/api/v1/user/:id"))
 	var req getUserRequest
+	var h header
 
 	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(
 			http.StatusBadRequest,
 			gin.H{"code": 400, "message": "Invalid user id"},
+		)
+		return
+	}
+
+	if err := ctx.ShouldBindHeader(&h); err != nil {
+		ctx.JSON(
+			http.StatusForbidden,
+			gin.H{"code": 403, "message": "Invalid user id"},
 		)
 		return
 	}
@@ -244,6 +278,14 @@ func (s *Server) GetUser(ctx *gin.Context) {
 		ctx.JSON(
 			http.StatusInternalServerError,
 			gin.H{"code": 500, "message": "Internal server error"},
+		)
+		return
+	}
+
+	if user.OwnerId != h.UserId {
+		ctx.JSON(
+			http.StatusForbidden,
+			gin.H{"code": 404, "message": "Action is not permitted"},
 		)
 		return
 	}

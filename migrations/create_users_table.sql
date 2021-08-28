@@ -4,5 +4,6 @@ create table if not exists users (
     firstname   varchar(50),
     lastname    varchar(50),
     email       varchar(50),
-    phone       varchar(12)
+    phone       varchar(12),
+    owner_id    varchar(36)
 );

@@ -35,6 +35,6 @@ func (service *UserServiceImpl) UpdateUser(user *models.User) error {
 	return service.repository.UpdateUser(user)
 }
 
-func (service *UserServiceImpl) DeleteUser(userId models.UserId) error {
-	return service.repository.DeleteUser(userId)
+func (service *UserServiceImpl) DeleteUser(userId models.UserId, ownerId string) error {
+	return service.repository.DeleteUser(userId, ownerId)
 }
