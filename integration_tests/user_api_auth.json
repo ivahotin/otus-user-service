@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "2129db3e-294e-4ddc-b744-2b4df0867440",
+		"_postman_id": "8e824fa9-b3e4-4494-87ef-b0aa2573ae8d",
 		"name": "User API with auth",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -26,7 +26,10 @@
 						"exec": [
 							"pm.test(\"Should register first user\", function() {",
 							"    pm.response.to.have.status(201);",
-							"})"
+							"})",
+							"",
+							"tests[\"[INFO] Request: \" + JSON.stringify(request)] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
 						],
 						"type": "text/javascript"
 					}
@@ -75,7 +78,10 @@
 							"    pm.response.to.have.status(200);",
 							"    let firstUserSessionId = pm.response.cookies.get(\"session_id\");",
 							"    pm.collectionVariables.set(\"firstUserSessionId\", firstUserSessionId);",
-							"})"
+							"})",
+							"",
+							"tests[\"[INFO] Request: \" + JSON.stringify(request)] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
 						],
 						"type": "text/javascript"
 					}
@@ -124,7 +130,10 @@
 							"    pm.response.to.have.status(200);",
 							"    let jsonData = pm.response.json();",
 							"    pm.collectionVariables.set(\"firstUserId\", jsonData.id);",
-							"})"
+							"})",
+							"",
+							"tests[\"[INFO] Request: \" + JSON.stringify(request)] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
 						],
 						"type": "text/javascript"
 					}
@@ -184,7 +193,10 @@
 						"exec": [
 							"pm.test(\"Should logout first user\", function() {",
 							"    pm.response.to.have.status(200);",
-							"})"
+							"})",
+							"",
+							"tests[\"[INFO] Request: \" + JSON.stringify(request)] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
 						],
 						"type": "text/javascript"
 					}
@@ -216,7 +228,10 @@
 						"exec": [
 							"pm.test(\"Shouldn't be able to get user profile without auth\", function() {",
 							"    pm.response.to.have.status(401);",
-							"})"
+							"})",
+							"",
+							"tests[\"[INFO] Request: \" + JSON.stringify(request)] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
 						],
 						"type": "text/javascript"
 					}
@@ -250,7 +265,10 @@
 						"exec": [
 							"pm.test(\"User can't update its profile without auth\", function() {",
 							"    pm.response.to.have.status(401);    ",
-							"});"
+							"});",
+							"",
+							"tests[\"[INFO] Request: \" + JSON.stringify(request)] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
 						],
 						"type": "text/javascript"
 					}
@@ -300,7 +318,10 @@
 							"    pm.response.to.have.status(200);",
 							"    let firstUserSessionId = pm.response.cookies.get(\"session_id\");",
 							"    pm.collectionVariables.set(\"firstUserSessionId\", firstUserSessionId);",
-							"})"
+							"})",
+							"",
+							"tests[\"[INFO] Request: \" + JSON.stringify(request)] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
 						],
 						"type": "text/javascript"
 					}
@@ -360,7 +381,10 @@
 						"exec": [
 							"pm.test(\"First user updates its profile\", function() {",
 							"    pm.response.to.have.status(200);    ",
-							"});"
+							"});",
+							"",
+							"tests[\"[INFO] Request: \" + JSON.stringify(request)] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
 						],
 						"type": "text/javascript"
 					}
@@ -412,7 +436,10 @@
 							"",
 							"    const jsonData = pm.response.json();",
 							"    pm.expect(jsonData.firstName).to.eq(pm.collectionVariables.get(\"firstUserFirstName\"));",
-							"})"
+							"})",
+							"",
+							"tests[\"[INFO] Request: \" + JSON.stringify(request)] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
 						],
 						"type": "text/javascript"
 					}
@@ -457,7 +484,10 @@
 						"exec": [
 							"pm.test(\"Should logout first user\", function() {",
 							"    pm.response.to.have.status(200);",
-							"})"
+							"})",
+							"",
+							"tests[\"[INFO] Request: \" + JSON.stringify(request)] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
 						],
 						"type": "text/javascript"
 					}
@@ -501,7 +531,10 @@
 						"exec": [
 							"pm.test(\"Should register first user\", function() {",
 							"    pm.response.to.have.status(201);",
-							"})"
+							"})",
+							"",
+							"tests[\"[INFO] Request: \" + JSON.stringify(request)] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
 						],
 						"type": "text/javascript"
 					}
@@ -550,7 +583,10 @@
 							"    pm.response.to.have.status(200);",
 							"    let secondUserSessionId = pm.response.cookies.get(\"session_id\");",
 							"    pm.collectionVariables.set(\"secondUserSessionId\", secondUserSessionId);",
-							"})"
+							"})",
+							"",
+							"tests[\"[INFO] Request: \" + JSON.stringify(request)] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
 						],
 						"type": "text/javascript"
 					}
@@ -597,7 +633,10 @@
 						"exec": [
 							"pm.test(\"User can't get another user's profile\", function() {",
 							"    pm.response.to.have.status(403);",
-							"})"
+							"})",
+							"",
+							"tests[\"[INFO] Request: \" + JSON.stringify(request)] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
 						],
 						"type": "text/javascript"
 					}
@@ -655,7 +694,10 @@
 						"exec": [
 							"pm.test(\"User can't update another user's profile\", function() {",
 							"    pm.response.to.have.status(404);    ",
-							"});"
+							"});",
+							"",
+							"tests[\"[INFO] Request: \" + JSON.stringify(request)] = true;",
+							"tests[\"[INFO] Response: \" + responseBody] = true;"
 						],
 						"type": "text/javascript"
 					}
