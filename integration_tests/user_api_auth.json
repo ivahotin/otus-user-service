@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "8456c50b-21e7-419f-90dd-94bc5ec3b7ca",
+		"_postman_id": "2129db3e-294e-4ddc-b744-2b4df0867440",
 		"name": "User API with auth",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -12,9 +12,9 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"let username = pm.variables.replaceIn(\"{{$randomUserName}}\")",
+							"let username = Math.random().toString(36).substring(2,7);",
 							"pm.collectionVariables.set(\"firstUserLogin\", username)",
-							"let password = pm.variables.replaceIn(\"{{$randomPassword}}\")",
+							"let password = Math.random().toString(36).substring(2,7);",
 							"pm.collectionVariables.set(\"firstUserPassword\", password)"
 						],
 						"type": "text/javascript"
@@ -259,7 +259,7 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"let username = pm.variables.replaceIn(\"{{$randomFirstName}}\")",
+							"let username = Math.random().toString(36).substring(2,7);",
 							"pm.collectionVariables.set(\"firstUserFirstName\", username)"
 						],
 						"type": "text/javascript"
@@ -345,7 +345,7 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"let username = pm.variables.replaceIn(\"{{$randomFirstName}}\")",
+							"let username = Math.random().toString(36).substring(2,7);",
 							"pm.collectionVariables.set(\"firstUserFirstName\", username)",
 							"let cookieJar = pm.cookies.jar();",
 							"let firstUserSessionId = pm.collectionVariables.get(\"firstUserSessionId\");",
@@ -487,9 +487,9 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"let username = pm.variables.replaceIn(\"{{$randomUserName}}\")",
+							"let username = Math.random().toString(36).substring(2,7);",
 							"pm.collectionVariables.set(\"secondUserName\", username)",
-							"let password = pm.variables.replaceIn(\"{{$randomPassword}}\")",
+							"let password = Math.random().toString(36).substring(2,7);",
 							"pm.collectionVariables.set(\"secondUserPassword\", password)"
 						],
 						"type": "text/javascript"
@@ -640,7 +640,7 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"let username = pm.variables.replaceIn(\"{{$randomFirstName}}\")",
+							"let username = Math.random().toString(36).substring(2,7);",
 							"pm.collectionVariables.set(\"firstUserFirstName\", username)",
 							"let cookieJar = pm.cookies.jar();",
 							"let secondUserSessionId = pm.collectionVariables.get(\"secondUserSessionId\");",
