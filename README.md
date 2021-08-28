@@ -1,10 +1,16 @@
 # otus-user-service
 User API
 
+
+### Схемы работы
+
+![alt text](screenshot/use_case.png "1")
+![alt text](screenshot/sequence.png "1")
+
+
 ### Директория с чартами сервисов
 
 `infra/`
-
 
 ### Установка
 
