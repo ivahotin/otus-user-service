@@ -7,7 +7,6 @@ User API
 
 ![mermaid-diagram-20200526103254](README.assets/restful.png)
 
-
 ## Event notification
 
 [Описание ASYNC интерфейса](./specs/eventsnotification/asyncapi.yaml)
@@ -16,13 +15,11 @@ User API
 
 ![mermaid-diagram-20200526103254](README.assets/eventsnotification.png)
 
-
 ## Event collaboration
 
 [Описание ASYNC интерфейса](./specs/eventcollaboration/asyncapi.yaml)
 
 ![mermaid-diagram-20200526103254](README.assets/eventcollaboration.png)
-
 
 ## Директория с чартами сервисов
 
