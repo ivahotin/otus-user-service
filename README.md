@@ -10,15 +10,24 @@ User API
 
 ## Event notification
 
-[Описание ASYNC инерфейса](./specs/eventsnotification/asyncapi.yaml)
+[Описание ASYNC интерфейса](./specs/eventsnotification/asyncapi.yaml)
 
 [Описание REST интерфейсов](http://petstore.swagger.io/?url=https://raw.githubusercontent.com/ivahotin/otus-user-service/main/specs/eventsnotification/rest-openapi_v2.yaml)
 
 ![mermaid-diagram-20200526103254](README.assets/eventsnotification.png)
 
+
+## Event collaboration
+
+[Описание ASYNC интерфейса](./specs/eventcollaboration/asyncapi.yaml)
+
+![mermaid-diagram-20200526103254](README.assets/eventcollaboration.png)
+
+
 ## Директория с чартами сервисов
 
 `infra/`
+
 
 ## Установка
 

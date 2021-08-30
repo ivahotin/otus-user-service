@@ -1,0 +1,128 @@
+asyncapi: 2.0.0
+info:
+  title: Создание заказа
+  version: '1.0.0'
+defaultContentType: application/json
+
+channels:
+  gateway/OrderCreationRequested:
+    publish:
+      summary: Пользователь запросил создание заказа
+      message:
+        name: order creation requested
+        payload:
+          type: object
+          properties:
+            userId:
+              type: string
+              format: uuid
+            price:
+              type: integer
+              format: int64
+          required:
+            - userId
+            - price
+          examples:
+            - payload:
+                userId: 'cf7b1894-a53c-4df6-8614-77d7926db59d'
+                price: 100
+              headers:
+                correlationId: 3241-1231-3123-1231
+  order-service/OrderPaymentRequested:
+    publish:
+      message:
+        name: order payment requested
+        title: Сервис заказов запросил оплату заказа
+        payload:
+          type: object
+          properties:
+            orderId:
+              type: string
+              format: uuid
+            amount:
+              type: integer
+              format: int64
+          required:
+            - orderId
+            - amount
+        examples:
+          - payload:
+              orderId: 'cf7b1894-a53c-4df6-8614-77d7926db59d'
+              amount: 100
+            headers:
+              idempotencyKey: xeEAddas
+              correlationId: 3241-1231-3123-1231
+  billing-service/OrderPaid:
+    publish:
+      message:
+        name: order paid
+        title: Биллинг сервис уведомляет об оплате заказа
+        payload:
+          type: object
+          properties:
+            orderId:
+              type: string
+              format: uuid
+          required:
+            - orderId
+        examples:
+          - payload:
+              orderId: 'cf7b1894-a53c-4df6-8614-77d7926db59d'
+            headers:
+              correlationId: 3241-1231-3123-1231
+  order-service/OrderCreated:
+    publish:
+      message:
+        name: order created
+        title: Сервис заказов создал заказа
+        payload:
+          type: object
+          properties:
+            orderId:
+              type: string
+              format: uuid
+            userId:
+              type: string
+              format: uuid
+          required:
+            - orderId
+            - userId
+        examples:
+          - payload:
+              orderId: 'cf7b1894-a53c-4df6-8614-77d7926db59d'
+              userId: 'cf7b1894-a53c-4df6-8614-77d7926db59d'
+            headers:
+              correlationId: 3241-1231-3123-1231
+  user-service/UserUpdated:
+    publish:
+      message:
+        name: user's profile updated
+        title: Сервис пользователей уведомляет об изменениях профиля
+        payload:
+          type: object
+          properties:
+            userId:
+              type: string
+              format: uuid
+            firstName:
+              type: string
+            lastName:
+              type: string
+            email:
+              type: string
+              format: email
+            phone:
+              type: string
+          required:
+            - userId
+            - firstName
+            - lastName
+            - email
+            - phone
+        examples:
+          - payload:
+              userId: 'cf7b1894-a53c-4df6-8614-77d7926db59d'
+              firstName: "Ivan"
+              lastName: "Fedorov"
+              email: "ivanov@gmail.com"
+              phone: "+7999999999" 
