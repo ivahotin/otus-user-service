@@ -90,6 +90,27 @@ paths:
       responses:
         '201':
           description: Уведомление успешно создано
+    get:
+      summary: Получение уведомлений
+      operationId: getUserNotification
+      tags:
+        - notification
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+            format: uuid
+          description: Идентификатор пользователя
+      responses:
+        '200':
+          description: Уведомления пользователя
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
   /users/{userId}:
     get:
       summary: Получение профиля пользователя

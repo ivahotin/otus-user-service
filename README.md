@@ -3,7 +3,7 @@ User API
 
 ## Restful 
 
-[Описание REST интерфейсов](http://petstore.swagger.io/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fschetinnikov-otus%2Farch-labs%2Fmaster%2Fapi-spec%2Frestful%2Frest-openapi.yaml)
+[Описание REST интерфейсов](http://petstore.swagger.io/?url=https://raw.githubusercontent.com/ivahotin/otus-user-service/main/specs/restful/rest-openapi.yaml)
 
 ![mermaid-diagram-20200526103254](README.assets/restful.png)
 
