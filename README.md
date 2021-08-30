@@ -1,18 +1,17 @@
 # otus-user-service
 User API
 
+## Restful 
 
-### Схемы работы
+[Описание REST интерфейсов](http://petstore.swagger.io/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fschetinnikov-otus%2Farch-labs%2Fmaster%2Fapi-spec%2Frestful%2Frest-openapi.yaml)
 
-![alt text](screenshot/use_case.png "1")
-![alt text](screenshot/sequence.png "1")
+![mermaid-diagram-20200526103254](README.assets/restful.png)
 
-
-### Директория с чартами сервисов
+## Директория с чартами сервисов
 
 `infra/`
 
-### Установка
+## Установка
 
 Установка user-service
 ```
@@ -31,14 +30,14 @@ helm upgrade --install -n auth-service -f infra/auth-service/values.yaml auth-se
 kubectl apply -f infra/api-gateway/ingress.yaml
 ```
 
-### Удаление
+## Удаление
 
 ```
 helm uninstall user-service -n user-service
 helm uninstall auth-service -n auth-service
 ```
 
-### Тестирование
+## Тестирование
 
 ```
 newman run --verbose integration_tests/user_api_auth.json
