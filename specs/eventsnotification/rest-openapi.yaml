@@ -1,0 +1,101 @@
+openapi: 3.0.0
+info:
+  contact:
+    email: ivahotin@gmail.com
+  title: Создание заказа
+  version: 0.1.0
+tags:
+  - name: order
+    description: Сервис заказов
+  - name: user
+    description: Сервис пользователей
+security:
+  - cookieAuth: []
+paths:
+  /orders/{orderId}:
+    get:
+      summary: Получение заказа по идентификатору
+      description: Получение заказа по идентификатору
+      operationId: getOrderById
+      parameters:
+        - in: path
+          name: orderId
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        '200':
+          description: заказ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+  /users/{userId}:
+    get:
+      summary: Получение профиля пользователя
+      operationId: getUserProfile
+      tags:
+        - user
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        '200':
+          description: Профиль пользователя
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: session_id
+  schemas:
+    Order:
+      type: object
+      properties:
+        id: 
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        price:
+          type: integer
+          format: int64
+      required:
+        - userId
+        - price
+    User:
+      type: object
+      properties:
+        userId:
+          type: string
+          format: uuid
+        firstName:
+          type: string
+        lastName:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+      required:
+        - userId
+        - firstName
+        - lastName
+        - email
+        - phone
