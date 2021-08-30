@@ -17,6 +17,8 @@ paths:
       summary: Получение заказа по идентификатору
       description: Получение заказа по идентификатору
       operationId: getOrderById
+      tags:
+        - order
       parameters:
         - in: path
           name: orderId
