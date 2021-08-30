@@ -12,7 +12,7 @@ User API
 
 [Описание ASYNC инерфейса](./specs/eventsnotification/asyncapi.yaml)
 
-[Описание REST интерфейсов](http://petstore.swagger.io/?url=https://raw.githubusercontent.com/ivahotin/otus-user-service/main/specs/eventsnotification/rest-openapi.yaml)
+[Описание REST интерфейсов](http://petstore.swagger.io/?url=https://raw.githubusercontent.com/ivahotin/otus-user-service/main/specs/eventsnotification/rest-openapi_v2.yaml)
 
 ![mermaid-diagram-20200526103254](README.assets/eventsnotification.png)
 
