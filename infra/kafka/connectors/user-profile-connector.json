@@ -9,6 +9,10 @@
         "database.password": "postgres",
         "database.dbname": "user-db",
         "database.server.name": "postgres",
-        "table.whitelist": "public.users"
+        "table.whitelist": "public.users",
+        "transforms": "route",   
+        "transforms.route.type": "org.apache.kafka.connect.transforms.RegexRouter",
+        "transforms.route.regex": "([^.]+)\\.([^.]+)\\.([^.]+)",
+        "transforms.route.replacement": "$3"
     }
 }
