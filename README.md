@@ -51,6 +51,16 @@ kubectl create ns auth-service
 helm upgrade --install -n auth-service -f infra/auth-service/values.yaml auth-service infra/auth-service/.
 ```
 
+Установка kafka
+```
+kubectl create ns kafka
+kubectl apply -f infra/kafka/spec.yaml
+helm upgrade --install -n kafka cp confluentinc/cp-helm-charts -f infra/kafka/cp_values.yaml
+kubectl apply -f infra/kafka/debezium_connector.yaml -n kafka
+curl -X POST http://192.168.49.2:30500/connectors -H 'Content-Type: application/json' -d @infra/kafka/connectors/user-profile-connector.json
+curl -X POST cp-cp-kafka-connect:8083/connectors -H 'Content-Type: application/json' -d @infra/kafka/connectors/billing-db-profile.json
+```
+
 Установка api-gateway
 ```
 kubectl apply -f infra/api-gateway/ingress.yaml
