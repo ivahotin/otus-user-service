@@ -3,7 +3,7 @@
   "config": {
     "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
     "tasks.max": "1",
-    "connection.url": "jdbc:postgresql://user-db.user-service:5432/user-db",
+    "connection.url": "jdbc:postgresql://billing-db.billing-service:5432/billing_db",
     "connection.user": "postgres",
     "connection.password": "postgres",
     "topics": "users",

@@ -51,6 +51,12 @@ kubectl create ns auth-service
 helm upgrade --install -n auth-service -f infra/auth-service/values.yaml auth-service infra/auth-service/.
 ```
 
+Установка billing-service
+```
+kubectl create ns billing-service
+helm upgrade --install -n billing-service -f infra/billing-service/values.yaml billing-service infra/billing-service/.
+```
+
 Установка kafka
 ```
 kubectl create ns kafka

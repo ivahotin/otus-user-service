@@ -174,7 +174,58 @@
 			"response": []
 		},
 		{
-			"name": "Logout first user Copy",
+			"name": "Billing account for the first user should be created",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Billing account for the first user should be created\", function() {",
+							"    pm.response.to.have.status(200);",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData).have.property(\"ownerId\", \"amount\");",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let cookieJar = pm.cookies.jar();",
+							"let firstUserSessionId = pm.collectionVariables.get(\"firstUserSessionId\");",
+							"cookieJar.set(\"{{$baseUrl}}\", \"session_id\", firstUserSessionId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/payments",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"payments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout first user",
 			"event": [
 				{
 					"listen": "prerequest",
