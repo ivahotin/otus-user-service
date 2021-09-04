@@ -17,6 +17,14 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
+  name: otus-order-service
+spec:
+  type: ExternalName
+  externalName: otus-order-service.order-service.svc.cluster.local
+---
+kind: Service
+apiVersion: v1
+metadata:
   name: otus-user-service
 spec:
   type: ExternalName
@@ -46,6 +54,13 @@ spec:
             backend:
               service:
                 name: otus-billing-service
+                port:
+                  number: 80
+          - path: /orders
+            pathType: Prefix
+            backend:
+              service:
+                name: otus-order-service
                 port:
                   number: 80
 ---

@@ -57,14 +57,20 @@ kubectl create ns billing-service
 helm upgrade --install -n billing-service -f infra/billing-service/values.yaml billing-service infra/billing-service/.
 ```
 
+Установка order-service
+```
+kubectl create ns order-service
+helm upgrade --install -n order-service -f infra/order-service/values.yaml order-service infra/order-service/.
+```
+
 Установка kafka
 ```
 kubectl create ns kafka
 kubectl apply -f infra/kafka/spec.yaml -n kafka
 helm upgrade --install -n kafka cp confluentinc/cp-helm-charts -f infra/kafka/cp_values.yaml
 kubectl apply -f infra/kafka/debezium_connector.yaml -n kafka
-curl -X POST http://192.168.49.2:30500/connectors -H 'Content-Type: application/json' -d @infra/kafka/connectors/user-profile-connector.json
-curl -X POST http://192.168.49.2:30500/connectors -H 'Content-Type: application/json' -d @infra/kafka/connectors/billing-db-profile.json
+curl -X POST http://$(minikube ip):30500/connectors -H 'Content-Type: application/json' -d @infra/kafka/connectors/user-profile-connector.json
+curl -X POST http://$(minikube ip):30500/connectors -H 'Content-Type: application/json' -d @infra/kafka/connectors/billing-db-profile.json
 ```
 
 Установка api-gateway

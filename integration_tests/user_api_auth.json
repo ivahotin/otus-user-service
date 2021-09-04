@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "8e824fa9-b3e4-4494-87ef-b0aa2573ae8d",
-		"name": "User API with auth",
+		"name": "Test order API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -132,6 +132,8 @@
 							"    pm.collectionVariables.set(\"firstUserId\", jsonData.id);",
 							"})",
 							"",
+							"setTimeout(function(){}, 2000);",
+							"",
 							"tests[\"[INFO] Request: \" + JSON.stringify(request)] = true;",
 							"tests[\"[INFO] Response: \" + responseBody] = true;"
 						],
@@ -182,8 +184,6 @@
 						"exec": [
 							"pm.test(\"Billing account for the first user should be created\", function() {",
 							"    pm.response.to.have.status(200);",
-							"    let jsonData = pm.response.json();",
-							"    pm.expect(jsonData).have.property(\"ownerId\", \"amount\");",
 							"})"
 						],
 						"type": "text/javascript"
@@ -211,6 +211,255 @@
 					"mode": "raw",
 					"raw": ""
 				},
+				"url": {
+					"raw": "http://{{baseUrl}}/payments",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"payments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add money to user's billing account",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let cookieJar = pm.cookies.jar();",
+							"let firstUserSessionId = pm.collectionVariables.get(\"firstUserSessionId\");",
+							"cookieJar.set(\"{{$baseUrl}}\", \"session_id\", firstUserSessionId);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Add money to user's billing account\", function() {",
+							"    pm.response.to.have.status(200);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"amount\": 10\n}"
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/payments/replenishments",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"payments",
+						"replenishments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Make order with price less than 10",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let cookieJar = pm.cookies.jar();",
+							"let firstUserSessionId = pm.collectionVariables.get(\"firstUserSessionId\");",
+							"cookieJar.set(\"{{$baseUrl}}\", \"session_id\", firstUserSessionId);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Billing account for the first user should be created\", function() {",
+							"    pm.response.to.have.status(200);",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData[\"is_success\"]).to.eql(true);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"userId\": \"c6cefdb0-2c81-4c72-a2d3-d9c1054e489a\",\n    \"price\": 5\n}"
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/orders",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check that money amount becomes less",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let cookieJar = pm.cookies.jar();",
+							"let firstUserSessionId = pm.collectionVariables.get(\"firstUserSessionId\");",
+							"cookieJar.set(\"{{$baseUrl}}\", \"session_id\", firstUserSessionId);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check that money amount becomes less\", function() {",
+							"    pm.response.to.have.status(200);",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData[\"amount\"]).to.eql(5);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/payments",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"payments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Make an order with price higher than billing account's amount",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let cookieJar = pm.cookies.jar();",
+							"let firstUserSessionId = pm.collectionVariables.get(\"firstUserSessionId\");",
+							"cookieJar.set(\"{{$baseUrl}}\", \"session_id\", firstUserSessionId);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Make an order with price higher than billing account's amount\", function() {",
+							"    pm.response.to.have.status(200);",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData[\"is_success\"]).to.eql(false);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"userId\": \"c6cefdb0-2c81-4c72-a2d3-d9c1054e489a\",\n    \"price\": 10\n}"
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/orders",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check that money amount in billing account left the same",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let cookieJar = pm.cookies.jar();",
+							"let firstUserSessionId = pm.collectionVariables.get(\"firstUserSessionId\");",
+							"cookieJar.set(\"{{$baseUrl}}\", \"session_id\", firstUserSessionId);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check that money amount becomes less\", function() {",
+							"    pm.response.to.have.status(200);",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData[\"amount\"]).to.eql(5);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
 				"url": {
 					"raw": "http://{{baseUrl}}/payments",
 					"protocol": "http",

@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: debezium-connector
-          image: ivakhotin/debezium-connector:1.2
+          image: ivakhotin/debezium-connector:1.2.1
           readinessProbe:
             httpGet:
               path: /
