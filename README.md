@@ -71,6 +71,8 @@ helm upgrade --install -n kafka cp confluentinc/cp-helm-charts -f infra/kafka/cp
 kubectl apply -f infra/kafka/debezium_connector.yaml -n kafka
 curl -X POST http://$(minikube ip):30500/connectors -H 'Content-Type: application/json' -d @infra/kafka/connectors/user-profile-connector.json
 curl -X POST http://$(minikube ip):30500/connectors -H 'Content-Type: application/json' -d @infra/kafka/connectors/billing-db-profile.json
+curl -X POST http://$(minikube ip):30500/connectors -H 'Content-Type: application/json' -d @infra/kafka/connectors/order-source-connector.json
+curl -X POST http://$(minikube ip):30500/connectors -H 'Content-Type: application/json' -d @infra/kafka/connectors/notification-db-sink-connector.json
 ```
 
 Установка api-gateway
@@ -83,6 +85,10 @@ kubectl apply -f infra/api-gateway/ingress.yaml
 ```
 helm uninstall user-service -n user-service
 helm uninstall auth-service -n auth-service
+helm uninstall billing-service -n billing-service
+helm uninstall notification-service -n notification-service
+helm uninstall order-service -n order-service
+helm uninstall cp -n kafka
 ```
 
 ## Тестирование

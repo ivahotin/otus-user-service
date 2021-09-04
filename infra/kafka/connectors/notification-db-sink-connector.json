@@ -1,0 +1,24 @@
+{
+    "name": "notification-connector",
+    "config": {
+      "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+      "tasks.max": "1",
+      "connection.url": "jdbc:postgresql://order-db.order-service:5432/order_db",
+      "connection.user": "postgres",
+      "connection.password": "postgres",
+      "topics": "orders",
+      "table.name.format": "notifications",
+      "pk.fields": "none",
+      "pk.mode": "none",
+      "auto.create": "false",
+      "auto.evolve": "false",
+      "insert.mode": "insert",
+      "delete.enabled": "false",
+      "fields.whitelist": "id, owner_id, price, is_success",
+      "transforms": "only_fields,rename_field",
+      "transforms.only_fields.type": "org.apache.kafka.connect.transforms.ReplaceField$Value",
+      "transforms.only_fields.whitelist": "id, owner_id, price, is_success",
+      "transforms.rename_field.type": "org.apache.kafka.connect.transforms.ReplaceField$Value",
+      "transforms.rename_field.renames": "id:order_id"
+    }
+  }

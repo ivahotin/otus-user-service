@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  order_db:
+    image: postgres
+    container_name: notification-db
+    volumes:
+      - notification_db:/var/lib/postgresql/data
+      - ./migrations/create_notifications_table.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_DB=notification_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    env_file:
+      - .local.env
+    networks:
+      - notification-network
+    ports:
+      - "5434:5432"
+
+networks:
+  notification-network:
+    driver: bridge
+
+volumes:
+  notification_db:
