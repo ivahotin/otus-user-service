@@ -29,7 +29,7 @@ User API
 
 [Описание ASYNC интерфейса](./specs/preferable/asyncapi.yaml)
 
-По своей природе взаимодействие `OrderService` и `BillingService` синхронное, потому что мы не можем судить об успешности создания заказа пока не удостоверились в том, что его можно оплатить. Данное взаимодействие может быть асинхронным, если речь идет о несрочных заказах. В этом случае пользователь может быть уведомлен, что заказ создан и находится в обработке. Однако если речь идет о заказе еды или такси, то врядли пользователь пожелает ждать неопределенное количество времени до подтверждения своего заказа. В свою очередь взаимодействие с `NotificationService` асинхронно, так как мы не беспокоимся о результате его выполнения. По мимо этого я считаю, что выполнить запрос к `UserService` проще чем поддерживать локальную копию данных в `NotificationService`.
+По своей природе взаимодействие `OrderService` и `BillingService` синхронное, потому что мы не можем судить об успешности создания заказа пока не удостоверились в том, что его можно оплатить. Данное взаимодействие может быть асинхронным, если речь идет о несрочных заказах. В этом случае пользователь может быть уведомлен, что заказ создан и находится в обработке. Однако если речь идет о заказе еды или такси, то врядли пользователь пожелает ждать неопределенное количество времени до подтверждения своего заказа. В свою очередь взаимодействие с `NotificationService` асинхронно, так как мы не беспокоимся о результате его выполнения.
 
 ![mermaid-diagram-20200526103254](README.assets/preferable.png)
 
@@ -74,6 +74,8 @@ helm upgrade --install -n notification-service -f infra/notification-service/val
 kubectl create ns kafka
 kubectl apply -f infra/kafka/spec.yaml -n kafka
 helm upgrade --install -n kafka cp confluentinc/cp-helm-charts -f infra/kafka/cp_values.yaml
+// Подождать пока все поды поднимутся ~5-6 минут
+watch -n 5 kubectl get pods -n kafka
 kubectl apply -f infra/kafka/debezium_connector.yaml -n kafka
 curl -X POST http://$(minikube ip):30500/connectors -H 'Content-Type: application/json' -d @infra/kafka/connectors/user-profile-connector.json
 curl -X POST http://$(minikube ip):30500/connectors -H 'Content-Type: application/json' -d @infra/kafka/connectors/billing-db-profile.json
