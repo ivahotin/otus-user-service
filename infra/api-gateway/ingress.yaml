@@ -22,6 +22,14 @@ spec:
   type: ExternalName
   externalName: otus-order-service.order-service.svc.cluster.local
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: otus-notification-service
+spec:
+  type: ExternalName
+  externalName: otus-notification-service.notification-service.svc.cluster.local
+---
 kind: Service
 apiVersion: v1
 metadata:
@@ -61,6 +69,13 @@ spec:
             backend:
               service:
                 name: otus-order-service
+                port:
+                  number: 80
+          - path: /notifications
+            pathType: Prefix
+            backend:
+              service:
+                name: otus-notification-service
                 port:
                   number: 80
 ---

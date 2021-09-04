@@ -299,7 +299,9 @@
 							"    pm.response.to.have.status(200);",
 							"    let jsonData = pm.response.json();",
 							"    pm.expect(jsonData[\"is_success\"]).to.eql(true);",
-							"})"
+							"})",
+							"",
+							"setTimeout(function(){}, 2000);"
 						],
 						"type": "text/javascript"
 					}
@@ -376,6 +378,51 @@
 			"response": []
 		},
 		{
+			"name": "Success notification should be created",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let cookieJar = pm.cookies.jar();",
+							"let firstUserSessionId = pm.collectionVariables.get(\"firstUserSessionId\");",
+							"cookieJar.set(\"{{$baseUrl}}\", \"session_id\", firstUserSessionId);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Billing account for the first user should be created\", function() {",
+							"    pm.response.to.have.status(200);",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.length).to.eql(1);",
+							"    pm.expect(jsonData[0][\"message\"].includes(\"has been successfully processed\"));",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/notifications",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"notifications"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Make an order with price higher than billing account's amount",
 			"event": [
 				{
@@ -397,7 +444,9 @@
 							"    pm.response.to.have.status(200);",
 							"    let jsonData = pm.response.json();",
 							"    pm.expect(jsonData[\"is_success\"]).to.eql(false);",
-							"})"
+							"})",
+							"",
+							"setTimeout(function(){}, 2000);"
 						],
 						"type": "text/javascript"
 					}
@@ -468,6 +517,51 @@
 					],
 					"path": [
 						"payments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Failed notification should be created",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let cookieJar = pm.cookies.jar();",
+							"let firstUserSessionId = pm.collectionVariables.get(\"firstUserSessionId\");",
+							"cookieJar.set(\"{{$baseUrl}}\", \"session_id\", firstUserSessionId);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Failed notification should be created\", function() {",
+							"    pm.response.to.have.status(200);",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.length).to.eql(2);",
+							"    pm.expect(jsonData[0][\"message\"].includes(\"has been successfully processed\") || jsonData[0][\"message\"].includes(\"couldn't been processed\"));",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/notifications",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"notifications"
 					]
 				}
 			},

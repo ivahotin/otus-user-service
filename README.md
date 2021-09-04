@@ -63,6 +63,12 @@ kubectl create ns order-service
 helm upgrade --install -n order-service -f infra/order-service/values.yaml order-service infra/order-service/.
 ```
 
+Установка notification-service
+```
+kubectl create ns notification-service
+helm upgrade --install -n notification-service -f infra/notification-service/values.yaml notification-service infra/notification-service/.
+```
+
 Установка kafka
 ```
 kubectl create ns kafka
