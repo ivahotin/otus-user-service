@@ -14,7 +14,7 @@
       "auto.evolve": "false",
       "insert.mode": "insert",
       "delete.enabled": "false",
-      "fields.whitelist": "order_id, owner_id, price, is_success",
+      "fields.whitelist": "order_id, owner_id, price, status",
       "transforms": "only_fields,rename_field",
       "transforms.only_fields.type": "org.apache.kafka.connect.transforms.ReplaceField$Value",
       "transforms.only_fields.whitelist": "id, owner_id, price, is_success",
