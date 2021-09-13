@@ -10,7 +10,7 @@ import org.springframework.web.client.RestTemplate
 import java.io.Serializable
 import java.util.UUID
 
-data class Payment(val amount: Long, val orderId: UUID): Serializable
+data class Payment(val amount: Long): Serializable
 
 @Component
 class BillingClient(
@@ -23,7 +23,8 @@ class BillingClient(
     fun payForOrder(userId: String, orderId: UUID, amount: Long): Boolean {
         val httpHeaders = HttpHeaders()
         httpHeaders.add("x-user-id", userId)
-        val requestBody = HttpEntity<Payment>(Payment(amount, orderId), httpHeaders)
+        httpHeaders.add("idempotency-key", orderId.toString())
+        val requestBody = HttpEntity<Payment>(Payment(amount), httpHeaders)
 
         return try {
             restTemplate.exchange(
