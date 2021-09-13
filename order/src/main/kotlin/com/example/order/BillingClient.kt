@@ -8,8 +8,9 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 import java.io.Serializable
+import java.util.UUID
 
-data class Payment(val amount: Long): Serializable
+data class Payment(val amount: Long, val orderId: UUID): Serializable
 
 @Component
 class BillingClient(
@@ -19,10 +20,10 @@ class BillingClient(
 
     private val restTemplate = RestTemplate()
 
-    fun payForOrder(userId: String, amount: Long): Boolean {
+    fun payForOrder(userId: String, orderId: UUID, amount: Long): Boolean {
         val httpHeaders = HttpHeaders()
         httpHeaders.add("x-user-id", userId)
-        val requestBody = HttpEntity<Payment>(Payment(amount), httpHeaders)
+        val requestBody = HttpEntity<Payment>(Payment(amount, orderId), httpHeaders)
 
         return try {
             restTemplate.exchange(

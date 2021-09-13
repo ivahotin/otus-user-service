@@ -1,19 +1,43 @@
 package com.example.order
 
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestHeader
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.*
 import java.util.UUID
 
 @RestController
 class OrderController(private val orderRepository: OrderRepository, private val billingClient: BillingClient) {
 
     @PostMapping("/orders")
-    fun createOrder(@RequestHeader("x-user-id") userId: String, @RequestBody order: OrderRequest): OrderResponse {
+    fun createOrder(
+            @RequestHeader("x-user-id") userId: String,
+            @RequestHeader("If-Match") version: Long,
+            @RequestBody orderRequest: OrderRequest
+    ): ResponseEntity<*> {
         val orderId = UUID.randomUUID()
-        val isPaid = billingClient.payForOrder(userId, order.price)
-        orderRepository.createOrder(Order(orderId, userId, order.price, isPaid))
-        return OrderResponse(orderId, isPaid)
+        val order = Order(orderId, userId, orderRequest.price, status = OrderStatus.IN_PROGRESS, version = version)
+        val (latestVersion, successfullyCreated) = orderRepository.createOrder(order)
+        if (!successfullyCreated) {
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .header("ETag", latestVersion.toString())
+                    .build<Any?>()
+        }
+        val isPaid = billingClient.payForOrder(userId, orderId, order.price)
+        val orderStatus = if (isPaid) OrderStatus.SUCCESS else OrderStatus.FAILED
+        orderRepository.updateOrderStatusById(orderId, orderStatus)
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .header("ETag", latestVersion.toString())
+                .body(Order(orderId, userId, orderRequest.price, orderStatus, version))
+    }
+
+    @GetMapping("/orders")
+    fun getOrders(@RequestHeader("x-user-id") userId: String): ResponseEntity<List<Order>> {
+        val orders = orderRepository.getOrdersByOwnerId(ownerId = userId)
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .header("ETag", orders.firstOrNull()?.version.toString() ?: "0")
+                .body(orders)
     }
 }
