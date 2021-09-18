@@ -298,10 +298,8 @@
 							"pm.test(\"Billing account for the first user should be created\", function() {",
 							"    pm.response.to.have.status(200);",
 							"    let jsonData = pm.response.json();",
-							"    pm.expect(jsonData[\"is_success\"]).to.eql(true);",
-							"})",
-							"",
-							"setTimeout(function(){}, 2000);"
+							"    pm.expect(jsonData[\"status\"]).to.eql(\"SUCCESS\");",
+							"})"
 						],
 						"type": "text/javascript"
 					}
@@ -313,6 +311,69 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "If-Match",
+						"value": "0",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"userId\": \"c6cefdb0-2c81-4c72-a2d3-d9c1054e489a\",\n    \"price\": 5\n}"
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/orders",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Make order with price less than 10 check idempotency of operation",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let cookieJar = pm.cookies.jar();",
+							"let firstUserSessionId = pm.collectionVariables.get(\"firstUserSessionId\");",
+							"cookieJar.set(\"{{$baseUrl}}\", \"session_id\", firstUserSessionId);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Billing account for the first user should be created\", function() {",
+							"    pm.response.to.have.status(409);",
+							"    pm.response.to.have.header(\"Etag\");",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "If-Match",
+						"value": "0",
 						"type": "text"
 					}
 				],
@@ -378,51 +439,6 @@
 			"response": []
 		},
 		{
-			"name": "Success notification should be created",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"let cookieJar = pm.cookies.jar();",
-							"let firstUserSessionId = pm.collectionVariables.get(\"firstUserSessionId\");",
-							"cookieJar.set(\"{{$baseUrl}}\", \"session_id\", firstUserSessionId);"
-						],
-						"type": "text/javascript"
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Billing account for the first user should be created\", function() {",
-							"    pm.response.to.have.status(200);",
-							"    let jsonData = pm.response.json();",
-							"    pm.expect(jsonData.length).to.eql(1);",
-							"    pm.expect(jsonData[0][\"message\"].includes(\"has been successfully processed\"));",
-							"})"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://{{baseUrl}}/notifications",
-					"protocol": "http",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"notifications"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Make an order with price higher than billing account's amount",
 			"event": [
 				{
@@ -443,7 +459,7 @@
 							"pm.test(\"Make an order with price higher than billing account's amount\", function() {",
 							"    pm.response.to.have.status(200);",
 							"    let jsonData = pm.response.json();",
-							"    pm.expect(jsonData[\"is_success\"]).to.eql(false);",
+							"    pm.expect(jsonData[\"status\"]).to.eql(\"SUCCESS\");",
 							"})",
 							"",
 							"setTimeout(function(){}, 2000);"
@@ -458,6 +474,11 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "If-Match",
+						"value": "1",
 						"type": "text"
 					}
 				],
@@ -517,51 +538,6 @@
 					],
 					"path": [
 						"payments"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Failed notification should be created",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"let cookieJar = pm.cookies.jar();",
-							"let firstUserSessionId = pm.collectionVariables.get(\"firstUserSessionId\");",
-							"cookieJar.set(\"{{$baseUrl}}\", \"session_id\", firstUserSessionId);"
-						],
-						"type": "text/javascript"
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Failed notification should be created\", function() {",
-							"    pm.response.to.have.status(200);",
-							"    let jsonData = pm.response.json();",
-							"    pm.expect(jsonData.length).to.eql(2);",
-							"    pm.expect(jsonData[0][\"message\"].includes(\"has been successfully processed\") || jsonData[0][\"message\"].includes(\"couldn't been processed\"));",
-							"})"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://{{baseUrl}}/notifications",
-					"protocol": "http",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"notifications"
 					]
 				}
 			},
