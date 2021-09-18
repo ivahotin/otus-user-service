@@ -1,5 +1,51 @@
-# otus-user-service
-User API
+## Идемпотентность API
+
+![mermaid-diagram-20200526103254](README.assets/idempotency.png)
+
+#### Идемпотентность order-service
+
+Для достижения идемпотентности в `order-service` используется версионирование списка заказов. Это реализовано следующим образом:
+
+1) В таблицу с заказами добавлена колонка `version`
+```
+create table if not exists orders (
+    id uuid primary key,
+    owner_id uuid not null,
+    price integer not null,
+    version integer not null,
+    status varchar(20) not null
+);
+
+create unique index concurrently if not exists owner_id_version_idx on orders (owner_id, version);
+```
+2) При создании заказа в запросе передается заголовок `If-Match: <версия списка>`. В случае если в запросе передается последняя версия, то заказ успешно создается с новой версией (+1 к версии переданной в заголовке `If-Match`). В противном случае возвращается ответ со статусом `409 Conflict` и заголовком `ETag: <последняя версия заказа>`.
+
+Недостатком этого подхода является необходимость проверки последней версии списка заказов перед операцией вставки в таблицу `orders`.
+
+```
+select max(version), owner_id from orders where owner_id = ? group by owner_id;
+```
+
+#### Идемпотентность billing-service
+
+`billing-service` принимает запросы с заголовком `Idempotency-Key`. Внутри себя `billing-service` поддерживает две таблицы:
+
+```
+create table if not exists billing_accounts (
+    owner_id uuid primary key,
+    amount integer not null default 0
+);
+create table if not exists transactions (
+    id serial primary key,
+    idempotency_key uuid not null,
+    created_at timestamp without time zone not null,
+    amount integer not null,
+    is_cancelled boolean not null default false
+);
+create unique index concurrently if not exists idempotency_key_idx on transactions using btree (idempotency_key) where is_cancelled = false;
+```
+
+Каждый раз когда необходимо выполнить операцию с платежным аккаунтом атомарно обновляются обе таблицы. Уникальный индекс на поле `idempotency_key` помогает предотвратить двойную оплату (или пополнение). Таким образом таблица `transactions` помогает достичь идемпотентности и выполняет роль аудиторского лога всех операций.
 
 ## Restful 
 
