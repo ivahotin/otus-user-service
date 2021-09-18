@@ -63,12 +63,6 @@ kubectl create ns order-service
 helm upgrade --install -n order-service -f infra/order-service/values.yaml order-service infra/order-service/.
 ```
 
-Установка notification-service
-```
-kubectl create ns notification-service
-helm upgrade --install -n notification-service -f infra/notification-service/values.yaml notification-service infra/notification-service/.
-```
-
 Установка kafka
 ```
 kubectl create ns kafka
@@ -79,8 +73,6 @@ watch -n 5 kubectl get pods -n kafka
 kubectl apply -f infra/kafka/debezium_connector.yaml -n kafka
 curl -X POST http://$(minikube ip):30500/connectors -H 'Content-Type: application/json' -d @infra/kafka/connectors/user-profile-connector.json
 curl -X POST http://$(minikube ip):30500/connectors -H 'Content-Type: application/json' -d @infra/kafka/connectors/billing-db-profile.json
-curl -X POST http://$(minikube ip):30500/connectors -H 'Content-Type: application/json' -d @infra/kafka/connectors/order-source-connector.json
-curl -X POST http://$(minikube ip):30500/connectors -H 'Content-Type: application/json' -d @infra/kafka/connectors/notification-db-sink-connector.json
 ```
 
 Установка api-gateway
@@ -94,7 +86,6 @@ kubectl apply -f infra/api-gateway/ingress.yaml
 helm uninstall user-service -n user-service
 helm uninstall auth-service -n auth-service
 helm uninstall billing-service -n billing-service
-helm uninstall notification-service -n notification-service
 helm uninstall order-service -n order-service
 helm uninstall cp -n kafka
 ```

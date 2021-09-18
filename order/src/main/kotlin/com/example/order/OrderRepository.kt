@@ -12,22 +12,23 @@ typealias CreationStatus = Boolean
 class OrderRepository(private val jdbcTemplate: JdbcTemplate) {
 
     fun createOrder(order: Order): Pair<Version, CreationStatus> {
+        val latestVersion = getLatestVersionOfOrderListForOwner(order.ownerId) ?: 0L
+        if (latestVersion != order.version) {
+            return latestVersion to false
+        }
+
         val isThereConflict = jdbcTemplate.update(
-                "insert into orders (id, owner_id, price, status, version) values (?::uuid, ?::uuid, ?, ?, ?) on conflict (owner_id, version) do nothing",
-                order.id,
-                order.ownerId,
-                order.price,
-                order.status.toString(),
-                order.version
+            "insert into orders (id, owner_id, price, status, version) values (?::uuid, ?::uuid, ?, ?, ?) on conflict (owner_id, version) do nothing",
+            order.id,
+            order.ownerId,
+            order.price,
+            order.status.toString(),
+            latestVersion + 1
         ) == 0
 
         return if (isThereConflict) {
-            val version = jdbcTemplate.queryForObject(
-                    "select version as latest_version from orders where owner_id = ?::uuid order by version desc limit 1",
-                    arrayOf(order.ownerId)
-            ) {
-                rs, _ -> rs.getLong("latest_version")
-            } ?: throw RuntimeException("Something goes wrong")
+            val version = getLatestVersionOfOrderListForOwner(order.ownerId)
+                ?: throw RuntimeException("Something goes wrong")
             version to false
         } else {
             order.version to true
@@ -36,24 +37,32 @@ class OrderRepository(private val jdbcTemplate: JdbcTemplate) {
 
     fun updateOrderStatusById(orderId: UUID, status: OrderStatus): Int {
         return jdbcTemplate.update(
-                "update orders set status = ? where id = ?::uuid",
-                status.toString(),
-                orderId
+            "update orders set status = ? where id = ?::uuid",
+            status.toString(),
+            orderId
         )
     }
 
     fun getOrdersByOwnerId(ownerId: String): List<Order> {
         return jdbcTemplate.query(
-                "select id, owner_id, price, status, version from orders where owner_id = ?::uuid order by version desc",
-                arrayOf(ownerId)
-        ) {
-            rs, _ -> Order(
-                id = UUID.fromString(rs.getString("id")),
-                ownerId = rs.getString("owner_id"),
-                price = rs.getLong("price"),
-                status = OrderStatus.valueOf(rs.getString("status")),
-                version = rs.getLong("version")
-            )
-        }
+            "select id, owner_id, price, status, version from orders where owner_id = ?::uuid order by version desc",
+            {
+                rs, _ -> Order(
+                    id = UUID.fromString(rs.getString("id")),
+                    ownerId = rs.getString("owner_id"),
+                    price = rs.getLong("price"),
+                    status = OrderStatus.valueOf(rs.getString("status")),
+                    version = rs.getLong("version")
+                )
+            },
+            ownerId
+        )
     }
+
+    fun getLatestVersionOfOrderListForOwner(ownerId: String): Long? =
+        jdbcTemplate.queryForObject(
+            "select version as latest_version from orders where owner_id = ?::uuid order by version desc limit 1",
+            {  rs, _ -> rs.getLong("latest_version") },
+            ownerId
+        )
 }

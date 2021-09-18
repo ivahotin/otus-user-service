@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
@@ -28,14 +29,17 @@ class BillingClient(
 
         return try {
             restTemplate.exchange(
-                    "http://$billingUrl:$billingPort/payments/withdrawals",
+                "http://$billingUrl:$billingPort/payments/withdrawals",
                     HttpMethod.PUT,
-                    requestBody,
-                    Any::class.java
+                requestBody,
+                Any::class.java
             )
             true
         } catch (exc: HttpClientErrorException) {
-            return false
+            when (exc.statusCode) {
+                HttpStatus.CONFLICT -> true
+                else -> false
+            }
         }
     }
 }
