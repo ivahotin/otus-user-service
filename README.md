@@ -23,7 +23,7 @@ create unique index concurrently if not exists owner_id_version_idx on orders (o
 Недостатком этого подхода является необходимость проверки последней версии списка заказов перед операцией вставки в таблицу `orders`.
 
 ```
-select max(version), owner_id from orders where owner_id = ? group by owner_id;
+select max(version) from orders where owner_id = ?;
 ```
 
 #### Идемпотентность billing-service
