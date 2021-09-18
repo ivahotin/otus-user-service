@@ -1,5 +1,6 @@
 package com.example.order
 
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
 import java.lang.RuntimeException
@@ -12,7 +13,7 @@ typealias CreationStatus = Boolean
 class OrderRepository(private val jdbcTemplate: JdbcTemplate) {
 
     fun createOrder(order: Order): Pair<Version, CreationStatus> {
-        val latestVersion = getLatestVersionOfOrderListForOwner(order.ownerId) ?: 0L
+        val latestVersion = getLatestVersionOfOrderListForOwner(order.ownerId)
         if (latestVersion != order.version) {
             return latestVersion to false
         }
@@ -28,7 +29,6 @@ class OrderRepository(private val jdbcTemplate: JdbcTemplate) {
 
         return if (isThereConflict) {
             val version = getLatestVersionOfOrderListForOwner(order.ownerId)
-                ?: throw RuntimeException("Something goes wrong")
             version to false
         } else {
             order.version to true
@@ -59,10 +59,15 @@ class OrderRepository(private val jdbcTemplate: JdbcTemplate) {
         )
     }
 
-    fun getLatestVersionOfOrderListForOwner(ownerId: String): Long? =
-        jdbcTemplate.queryForObject(
-            "select version as latest_version from orders where owner_id = ?::uuid order by version desc limit 1",
-            {  rs, _ -> rs.getLong("latest_version") },
-            ownerId
-        )
+    fun getLatestVersionOfOrderListForOwner(ownerId: String): Long {
+        return try {
+            jdbcTemplate.queryForObject(
+                "select version as latest_version from orders where owner_id = ?::uuid order by version desc limit 1",
+                { rs, _ -> rs.getLong("latest_version") },
+                ownerId
+            ) ?: 0
+        } catch (exc: EmptyResultDataAccessException) {
+            return 0L
+        }
+    }
 }
